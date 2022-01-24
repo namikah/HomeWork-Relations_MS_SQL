@@ -1,6 +1,6 @@
-CREATE DATABASE MyData
+CREATE DATABASE LibraryDb
 
-USE MyData
+USE LibraryDb
 
 CREATE TABLE Books(
 	Id int primary key identity,
