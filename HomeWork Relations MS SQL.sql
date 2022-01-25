@@ -4,7 +4,7 @@ USE LibraryDb
 
 CREATE TABLE Books(
 	Id int primary key identity,
-	Name nvarchar(50) unique not null
+	Name nvarchar(100) unique not null
 )
 
 CREATE TABLE Genres(
@@ -14,7 +14,8 @@ CREATE TABLE Genres(
 
 CREATE TABLE Autors(
 	Id int primary key identity,
-	Name nvarchar(50) not null
+	Name nvarchar(50) not null,
+	Surname nvarchar(50)
 )
 
 CREATE TABLE Customers(
@@ -68,10 +69,10 @@ VALUES	('Fantasy'),
 		('Art')
 
 INSERT INTO Autors
-VALUES	('Suzanne Collins'),
-		('Stephenie Meyer'),
-		('Jane Austen'),
-		('Harper Lee')
+VALUES	('Suzanne', 'Collins'),
+		('Stephenie', 'Meyer'),
+		('Jane', 'Austen'),
+		('Harper', 'Lee')
 
 INSERT INTO Customers
 VALUES	('Namik', 'Heydarov', 34, 'Male'),
@@ -117,25 +118,29 @@ VALUES	(1, 1, '2021-01-05', '2021-02-05'),
 		(4, 1, '2021-12-12', Null)
 
 --Hansi janra hansi kitablarin aid oldugunu gostermek
-SELECT gb.Id, g.Name 'Genres', b.Name 'Books' 
-FROM GenresBooks gb
-INNER JOIN Genres g ON gb.GenreId = g.Id
-INNER JOIN Books b ON gb.BookId = b.Id
+SELECT GB.Id, G.Name Genres, B.Name Books
+FROM GenresBooks GB
+LEFT JOIN Genres G ON GB.GenreId = G.Id
+LEFT JOIN Books B ON GB.BookId = B.Id
+ORDER BY Genres
 
 --Hansi authorun hansi kitablari var
-SELECT ab.Id, a.Name 'Autors', b.Name 'Books'
-FROM AutorBooks ab
-INNER JOIN Autors a ON a.Id = ab.AutorId
-INNER JOIN Books b ON b.Id = ab.BookId
+SELECT AB.Id, A.Name + ' ' + A.Surname AutorsFullName, B.Name Books
+FROM AutorBooks AB
+INNER JOIN Autors A ON A.Id = AB.AutorId
+INNER JOIN Books B ON B.Id = AB.BookId
+ORDER BY AutorsFullName
 
 --Hansi author hansi janrlarda yazir
-SELECT ag.Id, a.Name 'Autors', g.Name 'Genres'
+SELECT AG.Id, A.Name + ' ' + A.Surname AutorsFullName, G.Name Genres
 FROM AutorGenres ag
-INNER JOIN Autors a ON a.Id = ag.AutorId
-INNER JOIN Genres g ON g.Id = ag.GenreId
+INNER JOIN Autors A ON A.Id = AG.AutorId
+INNER JOIN Genres G ON G.Id = AG.GenreId
+ORDER BY AutorsFullName
 
 --Hansi customer hansi kitablari oxuyub
-SELECT o.Id, c.Name + ' ' + c.Surname 'Customers', c.Age, c.Gender, b.Name 'Books', o.GetDates, o.ReturnDates
-FROM Orders o
-INNER JOIN Customers c ON c.Id = o.CustomerId
-INNER JOIN Books b ON b.Id = o.BookId
+SELECT O.Id, C.Name + ' ' + C.Surname 'Customers FullName', C.Age, C.Gender, B.Name Books, O.GetDates, O.ReturnDates
+FROM Orders O
+INNER JOIN Customers C ON C.Id = O.CustomerId
+INNER JOIN Books B ON B.Id = O.BookId
+ORDER BY O.GetDates
