@@ -2,6 +2,7 @@ CREATE DATABASE LibraryDb
 
 USE LibraryDb
 
+--CREATE ALL TABLES
 CREATE TABLE Books(
 	Id int primary key identity,
 	Name nvarchar(100) unique not null
@@ -22,10 +23,9 @@ CREATE TABLE Customers(
 	Id int primary key identity,
 	Name nvarchar(50) not null,
 	Surname nvarchar(50) not null,
-	Age int not null,
+	Age int check(Age > 14) not null,
 	Gender nvarchar(20) not null
 )
-
 
 CREATE TABLE GenresBooks(
 	Id int primary key identity,
@@ -49,10 +49,11 @@ CREATE TABLE Orders(
 	Id int primary key identity,
 	BookId int references Books(Id),
 	CustomerId int references Customers(Id),
-	GetDates date default getDate(),
-	ReturnDates date
+	GetDates date default GETDATE() not null,
+	ReturnDates date default DATEADD(DAY, 10, GETDATE()) not null --default olaraq 10 gun qaytarma vaxti
 )
 
+--INSERT DATA TO TABLES
 INSERT INTO Books
 VALUES	('The Hunger Games'),
 		('Catching Fire'),
@@ -80,7 +81,8 @@ VALUES	('Namik', 'Heydarov', 34, 'Male'),
 		('Elman', 'Memmedov', 20, 'Male'),
 		('Nigar', 'Azizova', 19, 'FeMale '),
 		('Veli', 'Nebiyev', 30, 'Male'),
-		('Aysel', 'Ahmadova', 33, 'FeMale')
+		('Aysel', 'Ahmadova', 33, 'FeMale'),
+		('Leyla', 'Aliyeva', 15, 'FeMale')
 
 INSERT INTO GenresBooks
 VALUES	(5,1),
@@ -107,17 +109,18 @@ VALUES	(3,1),
 		(4,6)
 
 INSERT INTO Orders
-VALUES	(1, 1, '2021-01-05', '2021-02-05'),
+VALUES	(1, 7, '2021-01-05', '2021-02-05'),
 		(2, 1, '2021-02-12', '2021-03-12'),
 		(2, 3, '2021-03-15', '2021-04-16'),
 		(3, 2, '2021-04-15', '2021-05-05'),
-		(5, 4, '2021-04-22', '2021-05-20'),
-		(4, 5, '2021-12-12', '2021-12-30'),
-		(2, 1, '2021-12-12', Null),
-		(3, 1, '2021-12-12', Null),
-		(4, 1, '2021-12-12', Null)
+		(4, 4, '2021-04-22', '2021-05-20'),
+		(4, 5, '2021-01-12', '2021-12-30'),
+		(2, 7, '2022-01-15', '2022-01-25'),
+		(3, 1, '2022-01-16', '2022-01-26'),
+		(4, 1, '2022-01-17', '2022-01-27')
 
---Hansi janra hansi kitablarin aid oldugunu gostermek
+--HOMEWORK--
+--Hansi janra hansi kitablarin aid oldugunu gostermek[dbo].[GenresBooks]
 SELECT GB.Id, G.Name Genres, B.Name Books
 FROM GenresBooks GB
 LEFT JOIN Genres G ON GB.GenreId = G.Id
@@ -144,3 +147,16 @@ FROM Orders O
 INNER JOIN Customers C ON C.Id = O.CustomerId
 INNER JOIN Books B ON B.Id = O.BookId
 ORDER BY O.GetDates
+
+--Hec oxunmamish kitablar
+SELECT Id, Name 'Unread Books'
+FROM Books B
+WHERE NOT B.Id IN (SELECT O.BookId FROM ORDERS O)
+Order by Name
+
+--Top oxunan kitablar
+SELECT B.Name 'Books', COUNT(O.BookId) 'Read Count'
+FROM Orders O
+INNER JOIN Books B ON b.Id = O.BookId
+GROUP BY B.Name
+ORDER BY COUNT(O.BookId) DESC;
