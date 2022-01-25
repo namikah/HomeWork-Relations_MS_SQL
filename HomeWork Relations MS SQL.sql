@@ -148,15 +148,15 @@ INNER JOIN Customers C ON C.Id = O.CustomerId
 INNER JOIN Books B ON B.Id = O.BookId
 ORDER BY O.GetDates
 
+--Top oxunan kitablar
+SELECT B.Name 'Top Books', COUNT(O.BookId) 'Read Count'
+FROM Orders O
+INNER JOIN Books B ON b.Id = O.BookId
+GROUP BY B.Name
+ORDER BY COUNT(O.BookId) DESC;
+
 --Hec oxunmamish kitablar
 SELECT Id, Name 'Unread Books'
 FROM Books B
 WHERE NOT B.Id IN (SELECT O.BookId FROM ORDERS O)
 Order by Name
-
---Top oxunan kitablar
-SELECT B.Name 'Books', COUNT(O.BookId) 'Read Count'
-FROM Orders O
-INNER JOIN Books B ON b.Id = O.BookId
-GROUP BY B.Name
-ORDER BY COUNT(O.BookId) DESC;
